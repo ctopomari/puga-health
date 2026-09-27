@@ -87,7 +87,29 @@ export default function Page() {
 }
 
 function TalkPanel({ query, setQuery, onSend }: { query: string; setQuery: (value: string) => void; onSend: () => void }) {
-  return <section className="talk-panel"><div className="talk-intro"><span className="puga-avatar"><Sparkles /></span><p className="eyebrow">PUGAAI HEALTH</p><h1>Let&apos;s talk about your health.</h1><p>I can share trusted information and help you find the right next step. I&apos;m not a replacement for a clinician.</p></div><div className="suggestions">{['I have a headache', 'Prevent malaria', 'Find a nearby clinic'].map((item) => <button key={item} onClick={() => setQuery(item)}>{item}<ArrowRight /></button>)}</div><div className="composer"><textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ask PugaAI anything…" aria-label="Your health question" rows={2} /><div className="composer-actions"><button className="mic-button" aria-label="Use voice input"><Mic /></button><button className="send-button" onClick={onSend} aria-label="Send question"><ArrowRight /></button></div></div><div className="privacy-note"><ShieldCheck /> Your conversations are private and secure.</div></section>
+  const [listening, setListening] = useState(false)
+  const [transcript, setTranscript] = useState('')
+  const [response, setResponse] = useState('')
+
+  const toggleVoice = () => {
+    if (listening) {
+      setListening(false)
+      setTranscript(query || 'I have a headache')
+      setQuery(query || 'I have a headache')
+      return
+    }
+    setListening(true)
+    setTranscript('Listening… speak naturally')
+  }
+
+  const respond = () => {
+    const prompt = query.trim() || transcript
+    if (!prompt || listening) return
+    setResponse('Headaches can have many causes, including dehydration, stress, poor sleep, or an infection. Rest, drink water, and seek urgent care for a sudden severe headache, weakness, confusion, fever with a stiff neck, or vision changes.')
+    onSend()
+  }
+
+  return <section className="talk-panel voice-first-panel"><div className="talk-intro"><span className="puga-avatar"><Sparkles /></span><p className="eyebrow">PUGAAI HEALTH · PHASE 1</p><h1>Speak to learn about your health.</h1><p>PugaAI shares primary healthcare information and education using N-ATLAS. It does not diagnose or replace a clinician.</p></div><div className={`voice-orb ${listening ? 'is-listening' : ''}`}><div className="voice-wave"><span /><span /><span /><span /><span /></div><button className="voice-main-button" onClick={toggleVoice} aria-label={listening ? 'Stop listening' : 'Start voice command'}><Mic /></button><strong>{listening ? 'Listening' : 'Tap to speak'}</strong><small>{listening ? 'Say a health question' : 'Voice command only'}</small></div><div className="language-row"><span>Response language</span><button onClick={() => setTranscript('Language set to English')} aria-label="English response language">English <ChevronRight /></button></div>{transcript && <div className="transcript-card"><span className="eyebrow">TRANSCRIPT</span><p>{transcript}</p></div>}<div className="suggestions">{['What are malaria symptoms?', 'How can I prevent malaria?', 'What should I know about pregnancy?'].map((item) => <button key={item} onClick={() => { setQuery(item); setTranscript(item) }}>{item}<ArrowRight /></button>)}</div><div className="composer"><textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type a question to test N-ATLAS…" aria-label="Health question" rows={2} /><div className="composer-actions"><button className="mic-button" onClick={toggleVoice} aria-label="Use voice input"><Mic /></button><button className="send-button" onClick={respond} aria-label="Get health education response"><ArrowRight /></button></div></div>{response && <div className="response-card"><div className="response-heading"><Sparkles /><strong>Primary healthcare information</strong></div><p>{response}</p><small>Educational information from PugaAI Health · N-ATLAS phase 1</small></div>}<div className="privacy-note"><ShieldCheck /> No care linkage in phase 1. Your conversation stays educational.</div></section>
 }
 
 function CarePanel({ onBook }: { onBook: () => void }) { return <section className="page-panel"><p className="eyebrow">CARE NAVIGATION</p><h1>Care that fits your life.</h1><p className="panel-lede">Find trusted providers, manage appointments, and keep every next step in one place.</p><div className="care-feature"><span className="feature-icon"><Stethoscope /></span><div><strong>Find care near you</strong><p>Search clinics, pharmacies, and labs around Lagos.</p></div><ChevronRight /></div><div className="care-feature"><span className="feature-icon"><CalendarDays /></span><div><strong>Upcoming appointments</strong><p>{appointments.length} visits planned this month.</p></div><ChevronRight /></div><button className="primary-cta" onClick={onBook}>Find a provider <ArrowRight /></button></section> }
