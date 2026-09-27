@@ -1,0 +1,25 @@
+{
+  "name": "pugaai-health-frontend",
+  "private": true,
+  "version": "1.4.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.mjs",
+    "qa:static": "node tests/static-validation.mjs",
+    "qa:preflight": "node scripts/release-preflight.mjs",
+    "qa:security": "node tests/security-hardening.test.mjs",
+    "qa:rc": "node tests/release-candidate.test.mjs",
+    "qa:budget": "node scripts/performance-budget.mjs",
+    "qa": "npm run test && npm run qa:static && npm run qa:security && npm run qa:rc && npm run qa:preflight && npm run build && npm run qa:budget"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {}
+}

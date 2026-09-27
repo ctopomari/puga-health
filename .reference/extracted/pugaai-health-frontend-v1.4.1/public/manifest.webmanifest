@@ -1,0 +1,14 @@
+{
+  "name": "PugaAI Health",
+  "short_name": "PugaAI Health",
+  "description": "PugaAI Health — Your AI-powered voice health navigator.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbf8fc",
+  "theme_color": "#4d147d",
+  "icons": [
+    {"src":"/puga-trinicare-official.png","sizes":"1254x1254","type":"image/png","purpose":"any maskable"},
+    {"src":"/puga-trinicare-compact.png","sizes":"512x512","type":"image/png","purpose":"any"}
+  ]
+}

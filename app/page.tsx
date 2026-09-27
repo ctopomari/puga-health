@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Activity, ArrowRight, Bell, CalendarDays, ChevronRight, CircleHelp, HeartPulse, Home, MessageCircle, Mic, MoreHorizontal, Search, ShieldCheck, Sparkles, Stethoscope, UserRound, UsersRound } from 'lucide-react'
+import { Activity, ArrowRight, Bell, CalendarDays, ChevronRight, CircleHelp, FileHeart, HeartPulse, Home, Info, LockKeyhole, MessageCircle, Mic, MoreHorizontal, Search, Settings2, ShieldCheck, Sparkles, Stethoscope, UserRound, UsersRound, WalletCards } from 'lucide-react'
 
 const topics = [
   { label: 'Malaria prevention', icon: ShieldCheck, tone: 'mint' },
@@ -20,6 +20,9 @@ export default function Page() {
   const [query, setQuery] = useState('')
   const [showAllTopics, setShowAllTopics] = useState(false)
   const [toast, setToast] = useState('')
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
+  const notifications = ['appointment']
 
   const notify = (message: string) => {
     setToast(message)
@@ -39,7 +42,12 @@ export default function Page() {
             <img src="/puga-trinicare-compact.png" alt="Puga TriniCare" className="brand-mark" />
             <div><span className="brand-name">Puga</span><span className="brand-sub">AI Health</span></div>
           </div>
-          <button className="icon-button" aria-label="Notifications" onClick={() => notify('You are all caught up')}><Bell /></button>
+          <div className="header-actions">
+            <button className="icon-button tooltip-trigger" aria-label="Help and safety" data-tooltip="Health information and safety help" onClick={() => setShowHelp(!showHelp)}><CircleHelp /></button>
+            <button className="icon-button notification-trigger" aria-label="Notifications" data-tooltip="Notifications" onClick={() => setShowNotifications(!showNotifications)}><Bell />{notifications.length > 0 && <span className="notification-dot" />}</button>
+            {showNotifications && <div className="notification-popover" role="dialog" aria-label="Notifications"><strong>Notifications</strong><p>Your teleconsultation with Dr. Amaka is tomorrow at 10:30 AM.</p><button onClick={() => { setShowNotifications(false); notify('Notifications marked as read') }}>Mark as read</button></div>}
+            {showHelp && <div className="help-popover" role="tooltip"><strong>Need urgent help?</strong><p>For emergencies, call your local emergency service. PugaAI provides information, not a diagnosis.</p></div>}
+          </div>
         </header>
 
         {activeTab === 'home' && <>
@@ -68,8 +76,10 @@ export default function Page() {
         {activeTab === 'talk' && <TalkPanel query={query} setQuery={setQuery} onSend={() => { notify(query ? 'PugaAI is thinking…' : 'Try asking a health question'); setQuery('') }} />}
         {activeTab === 'care' && <CarePanel onBook={() => notify('Care finder opened')} />}
         {activeTab === 'health' && <HealthPanel />}
+        {activeTab === 'id' && <HealthIdPanel onAction={notify} />}
+        {activeTab === 'access' && <AccessPanel onAction={notify} />}
 
-        <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab(id)}><Icon /><span>{label}</span></button>)}</nav>
+        <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'id', label: 'Health ID', Icon: FileHeart }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab(id)}><Icon /><span>{label}</span></button>)}</nav>
         {toast && <div className="toast" role="status">{toast}</div>}
       </div>
     </main>
@@ -82,4 +92,8 @@ function TalkPanel({ query, setQuery, onSend }: { query: string; setQuery: (valu
 
 function CarePanel({ onBook }: { onBook: () => void }) { return <section className="page-panel"><p className="eyebrow">CARE NAVIGATION</p><h1>Care that fits your life.</h1><p className="panel-lede">Find trusted providers, manage appointments, and keep every next step in one place.</p><div className="care-feature"><span className="feature-icon"><Stethoscope /></span><div><strong>Find care near you</strong><p>Search clinics, pharmacies, and labs around Lagos.</p></div><ChevronRight /></div><div className="care-feature"><span className="feature-icon"><CalendarDays /></span><div><strong>Upcoming appointments</strong><p>{appointments.length} visits planned this month.</p></div><ChevronRight /></div><button className="primary-cta" onClick={onBook}>Find a provider <ArrowRight /></button></section> }
 
-function HealthPanel() { return <section className="page-panel"><p className="eyebrow">MY HEALTH</p><h1>Your health, in view.</h1><p className="panel-lede">Small steps add up. Here&apos;s a gentle snapshot of your recent activity.</p><div className="health-score"><div><span className="eyebrow">WELLNESS CHECK-IN</span><strong>Looking good</strong><p>Keep your routine going this week.</p></div><div className="score">82</div></div><div className="metric-row"><div><Activity /><strong>7,420</strong><span>Steps this week</span></div><div><HeartPulse /><strong>3</strong><span>Check-ins</span></div><div><CircleHelp /><strong>2</strong><span>Care actions</span></div></div></section> }
+function HealthPanel() { return <section className="page-panel"><p className="eyebrow">MY HEALTH</p><h1>Your health, in view.</h1><p className="panel-lede">Small steps add up. Here&apos;s a gentle snapshot of your recent activity.</p><div className="health-score"><div><span className="eyebrow">WELLNESS CHECK-IN</span><strong>Looking good</strong><p>Keep your routine going this week.</p></div><div className="score">82</div></div><div className="metric-row"><div><Activity /><strong>7,420</strong><span>Steps this week</span></div><div><HeartPulse /><strong>3</strong><span>Check-ins</span></div><div><CircleHelp /><strong>2</strong><span>Care actions</span></div></div><div className="reference-list"><strong>More from your health space</strong><button><WalletCards /> Payments <ChevronRight /></button><button><Settings2 /> Privacy &amp; access <ChevronRight /></button></div></section> }
+
+function HealthIdPanel({ onAction }: { onAction: (message: string) => void }) { return <section className="page-panel"><p className="eyebrow">PROTECTED HEALTH ID</p><h1>Your care identity, ready when you need it.</h1><p className="panel-lede">Share the right information with trusted providers while keeping your health data private.</p><div className="health-id-card"><div><span>PUGA HEALTH ID</span><strong>AMAKA OKAFOR</strong><small>PHI-••••-4829</small></div><ShieldCheck /></div><div className="privacy-card"><LockKeyhole /><div><strong>Private by default</strong><p>Your Health ID is protected and only shared with your permission.</p></div></div><button className="primary-cta" onClick={() => onAction('Health ID sharing options opened')}>Manage access <ArrowRight /></button></section> }
+
+function AccessPanel({ onAction }: { onAction: (message: string) => void }) { return <section className="page-panel"><p className="eyebrow">MY ACCESS</p><h1>Stay in control of who helps you.</h1><p className="panel-lede">Review trusted people and services with permission to support your care.</p><div className="access-card"><div className="access-row"><span className="access-avatar">DR</span><div><strong>Dr. Amaka Okafor</strong><small>Teleconsultation provider</small></div><span className="status-badge">Allowed</span><MoreHorizontal /></div><div className="access-row"><span className="access-avatar">LI</span><div><strong>Lagos Island Clinic</strong><small>Appointment coordination</small></div><span className="status-badge">Allowed</span><MoreHorizontal /></div></div><button className="secondary-cta" onClick={() => onAction('Access settings opened')}><Info /> Learn about privacy</button></section> }
