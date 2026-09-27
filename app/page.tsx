@@ -22,7 +22,8 @@ export default function Page() {
   const [toast, setToast] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
-  const [modal, setModal] = useState<'emergency' | 'consent' | 'profile' | 'appointment' | 'language' | null>(null)
+  const [showProfile, setShowProfile] = useState(false)
+  const [modal, setModal] = useState<'emergency' | 'consent' | 'appointment' | 'language' | null>(null)
   const notifications = ['appointment']
 
   const notify = (message: string) => {
@@ -58,7 +59,15 @@ export default function Page() {
               <h1>Good morning, <em>Amaka</em></h1>
               <p className="intro">Your everyday health companion, right here.</p>
             </div>
-            <button className="avatar tooltip-trigger" aria-label="Open your profile" data-tooltip="Profile and session controls" onClick={() => setModal('profile')}>A</button>
+            <div className="profile-menu-wrap">
+              <button className="avatar tooltip-trigger" aria-label="Open your profile" aria-expanded={showProfile} data-tooltip="Profile and session controls" onClick={() => setShowProfile(!showProfile)}>A</button>
+              {showProfile && <div className="profile-dropdown" role="menu" aria-label="Profile menu">
+                <div className="profile-dropdown-header"><div className="profile-avatar">A</div><div><strong>Amaka Okafor</strong><span>Patient account</span></div></div>
+                <button role="menuitem" onClick={() => { setShowProfile(false); setModal('consent') }}><ShieldCheck /> Privacy and permissions <ChevronRight /></button>
+                <button role="menuitem" onClick={() => { setShowProfile(false); notify('Account settings are coming in phase 2') }}><Settings2 /> Account settings <ChevronRight /></button>
+                <button role="menuitem" onClick={() => { setShowProfile(false); notify('Sign-in is available in phase 2') }}><UserRound /> Sign out <ChevronRight /></button>
+              </div>}
+            </div>
           </section>
 
           <section className="hero-card">
@@ -82,7 +91,6 @@ export default function Page() {
 
         {modal === 'emergency' && <Modal title="Urgent health concern?" onClose={() => setModal(null)}><div className="alert-icon">!</div><p className="modal-copy">PugaAI Health is not an emergency service. If you or someone else may be in immediate danger, seek urgent medical attention or go to the nearest appropriate healthcare facility.</p><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Close</button><button className="primary-cta" onClick={() => { setModal(null); notify('Emergency guidance acknowledged') }}>I understand <ArrowRight /></button></div></Modal>}
         {modal === 'consent' && <Modal title="Permission before protected data" onClose={() => setModal(null)}><div className="permission-card"><LockKeyhole /><div><strong>Purpose-limited access</strong><p>PugaAI Health should only receive the minimum health information needed for the task you approve.</p></div></div><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Not now</button><button className="primary-cta" onClick={() => { setModal(null); notify('Permission granted for this session') }}>Continue <ArrowRight /></button></div></Modal>}
-        {modal === 'profile' && <Modal title="Your PugaAI Health profile" onClose={() => setModal(null)}><div className="profile-panel"><div className="profile-avatar">A</div><div><strong>Patient account</strong><span>Protected session controls available</span></div></div><button className="modal-list-button" onClick={() => { setModal('consent') }}><ShieldCheck /> Privacy and permissions <ChevronRight /></button><button className="modal-list-button" onClick={() => { setModal(null); notify('Sign-in is available in phase 2') }}><UserRound /> Account settings <ChevronRight /></button></Modal>}
         {modal === 'appointment' && <Modal title="Appointment details" onClose={() => setModal(null)}><div className="appointment-detail"><span className="status-badge">Upcoming</span><h3>Teleconsultation</h3><p><strong>Dr. Amaka Okafor</strong><br />Lagos Island Clinic</p><div className="detail-grid"><div><small>Date</small><strong>24 September</strong></div><div><small>Time</small><strong>10:30 AM</strong></div></div></div><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Close</button><button className="primary-cta" onClick={() => { setModal(null); notify('Teleconsultation details opened') }}>View care plan <ArrowRight /></button></div></Modal>}
         {modal === 'language' && <Modal title="Choose response language" onClose={() => setModal(null)}><p className="modal-copy">Choose the language PugaAI should use for health education responses.</p><button className="modal-list-button selected" onClick={() => { setModal(null); notify('English selected') }}>English (Nigeria) <span>Selected</span></button><button className="modal-list-button" onClick={() => { setModal(null); notify('Nigerian Pidgin selected') }}>Nigerian Pidgin <ChevronRight /></button><button className="modal-list-button" onClick={() => { setModal(null); notify('Yorùbá selected') }}>Yorùbá <ChevronRight /></button></Modal>}
 
