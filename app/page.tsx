@@ -1,0 +1,85 @@
+'use client'
+
+import { useState } from 'react'
+import { Activity, ArrowRight, Bell, CalendarDays, ChevronRight, CircleHelp, HeartPulse, Home, MessageCircle, Mic, MoreHorizontal, Search, ShieldCheck, Sparkles, Stethoscope, UserRound, UsersRound } from 'lucide-react'
+
+const topics = [
+  { label: 'Malaria prevention', icon: ShieldCheck, tone: 'mint' },
+  { label: 'Child health', icon: UsersRound, tone: 'peach' },
+  { label: 'Pregnancy', icon: HeartPulse, tone: 'lavender' },
+  { label: 'Blood pressure', icon: Activity, tone: 'sky' },
+]
+
+const appointments = [
+  { day: '24', month: 'SEP', title: 'Teleconsultation', provider: 'Dr. Amaka Okafor · 10:30 AM', type: 'Video visit' },
+  { day: '03', month: 'OCT', title: 'Blood pressure check', provider: 'Lagos Island Clinic · 2:00 PM', type: 'In-person' },
+]
+
+export default function Page() {
+  const [activeTab, setActiveTab] = useState('home')
+  const [query, setQuery] = useState('')
+  const [showAllTopics, setShowAllTopics] = useState(false)
+  const [toast, setToast] = useState('')
+
+  const notify = (message: string) => {
+    setToast(message)
+    window.setTimeout(() => setToast(''), 2800)
+  }
+
+  const startConversation = (prompt = '') => {
+    setActiveTab('talk')
+    if (prompt) notify(`Opening PugaAI on “${prompt}”`)
+  }
+
+  return (
+    <main className="app-shell">
+      <div className="app-frame">
+        <header className="topbar">
+          <div className="brand-lockup">
+            <img src="/puga-trinicare-compact.png" alt="Puga TriniCare" className="brand-mark" />
+            <div><span className="brand-name">Puga</span><span className="brand-sub">AI Health</span></div>
+          </div>
+          <button className="icon-button" aria-label="Notifications" onClick={() => notify('You are all caught up')}><Bell /></button>
+        </header>
+
+        {activeTab === 'home' && <>
+          <section className="welcome-block">
+            <div>
+              <p className="eyebrow">TUESDAY, SEPTEMBER 24</p>
+              <h1>Good morning, <em>Amaka</em></h1>
+              <p className="intro">Your everyday health companion, right here.</p>
+            </div>
+            <div className="avatar" aria-label="Amaka profile">A</div>
+          </section>
+
+          <section className="hero-card">
+            <div className="hero-copy"><div className="sparkle"><Sparkles /></div><p className="eyebrow light">YOUR HEALTH COMPANION</p><h2>How can Puga help you today?</h2><p>Ask a question, understand your symptoms, or find the right care.</p><button className="hero-button" onClick={() => startConversation()}>Talk to PugaAI <ArrowRight /></button></div>
+            <div className="hero-orb"><div className="orb-ring"><div className="orb-core"><HeartPulse /></div></div></div>
+          </section>
+
+          <section className="section-block">
+            <div className="section-heading"><div><p className="eyebrow">EXPLORE</p><h2>What can I help with?</h2></div><button className="text-button" onClick={() => setShowAllTopics(!showAllTopics)}>{showAllTopics ? 'Show less' : 'See all'}</button></div>
+            <div className="topic-grid">{(showAllTopics ? [...topics, { label: 'Find care', icon: Search, tone: 'peach' }, { label: 'Nutrition', icon: Activity, tone: 'mint' }] : topics).map((topic) => { const Icon = topic.icon; return <button className="topic-card" key={topic.label} onClick={() => startConversation(topic.label)}><span className={`topic-icon ${topic.tone}`}><Icon /></span><span>{topic.label}</span><ChevronRight /></button> })}</div>
+          </section>
+
+          <section className="section-block"><div className="section-heading"><div><p className="eyebrow">UP NEXT</p><h2>Your care plan</h2></div><button className="text-button" onClick={() => setActiveTab('care')}>View all</button></div><div className="appointment-card"><div className="date-tile"><strong>{appointments[0].day}</strong><span>{appointments[0].month}</span></div><div className="appointment-copy"><strong>{appointments[0].title}</strong><span>{appointments[0].provider}</span><small>{appointments[0].type}</small></div><button className="more-button" aria-label="More appointment options" onClick={() => notify('Appointment options opened')}><MoreHorizontal /></button></div></section>
+        </>}
+
+        {activeTab === 'talk' && <TalkPanel query={query} setQuery={setQuery} onSend={() => { notify(query ? 'PugaAI is thinking…' : 'Try asking a health question'); setQuery('') }} />}
+        {activeTab === 'care' && <CarePanel onBook={() => notify('Care finder opened')} />}
+        {activeTab === 'health' && <HealthPanel />}
+
+        <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab(id)}><Icon /><span>{label}</span></button>)}</nav>
+        {toast && <div className="toast" role="status">{toast}</div>}
+      </div>
+    </main>
+  )
+}
+
+function TalkPanel({ query, setQuery, onSend }: { query: string; setQuery: (value: string) => void; onSend: () => void }) {
+  return <section className="talk-panel"><div className="talk-intro"><span className="puga-avatar"><Sparkles /></span><p className="eyebrow">PUGAAI HEALTH</p><h1>Let&apos;s talk about your health.</h1><p>I can share trusted information and help you find the right next step. I&apos;m not a replacement for a clinician.</p></div><div className="suggestions">{['I have a headache', 'Prevent malaria', 'Find a nearby clinic'].map((item) => <button key={item} onClick={() => setQuery(item)}>{item}<ArrowRight /></button>)}</div><div className="composer"><textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ask PugaAI anything…" aria-label="Your health question" rows={2} /><div className="composer-actions"><button className="mic-button" aria-label="Use voice input"><Mic /></button><button className="send-button" onClick={onSend} aria-label="Send question"><ArrowRight /></button></div></div><div className="privacy-note"><ShieldCheck /> Your conversations are private and secure.</div></section>
+}
+
+function CarePanel({ onBook }: { onBook: () => void }) { return <section className="page-panel"><p className="eyebrow">CARE NAVIGATION</p><h1>Care that fits your life.</h1><p className="panel-lede">Find trusted providers, manage appointments, and keep every next step in one place.</p><div className="care-feature"><span className="feature-icon"><Stethoscope /></span><div><strong>Find care near you</strong><p>Search clinics, pharmacies, and labs around Lagos.</p></div><ChevronRight /></div><div className="care-feature"><span className="feature-icon"><CalendarDays /></span><div><strong>Upcoming appointments</strong><p>{appointments.length} visits planned this month.</p></div><ChevronRight /></div><button className="primary-cta" onClick={onBook}>Find a provider <ArrowRight /></button></section> }
+
+function HealthPanel() { return <section className="page-panel"><p className="eyebrow">MY HEALTH</p><h1>Your health, in view.</h1><p className="panel-lede">Small steps add up. Here&apos;s a gentle snapshot of your recent activity.</p><div className="health-score"><div><span className="eyebrow">WELLNESS CHECK-IN</span><strong>Looking good</strong><p>Keep your routine going this week.</p></div><div className="score">82</div></div><div className="metric-row"><div><Activity /><strong>7,420</strong><span>Steps this week</span></div><div><HeartPulse /><strong>3</strong><span>Check-ins</span></div><div><CircleHelp /><strong>2</strong><span>Care actions</span></div></div></section> }

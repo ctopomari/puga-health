@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "./puga/puga.css";
+
+@theme {
+  --color-puga-purple: #4b126f;
+  --color-puga-gold: #d9a52d;
+  --color-puga-ink: #1e1825;
+  --color-puga-muted: #756b7d;
+  --color-puga-soft: #faf8fc;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+.auth-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.auth-form label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #776a80;
+}
+.auth-form input {
+  width: 100%;
+  border: 1px solid var(--line, #e8e1ec);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 13px;
+}
+.admin-login.card,
+.validation-setup.card,
+.validation-active.card {
+  background: #fff;
+  border: 1px solid var(--line, #e8e1ec);
+  border-radius: 18px;
+  padding: 22px;
+  display: grid;
+  gap: 10px;
+}
+.admin-login form,
+.validation-setup {
+  display: grid;
+  gap: 10px;
+}
+.admin-login input,
+.validation-setup input[type="text"],
+.validation-setup input:not([type="checkbox"]) {
+  width: 100%;
+  border: 1px solid var(--line, #e8e1ec);
+  border-radius: 10px;
+  padding: 11px 12px;
+}
+.consent-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted, #756b7d);
+}
+.validation-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.info-card {
+  background: #fff;
+  border: 1px solid var(--line, #e8e1ec);
+  border-radius: 16px;
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+}
+.info-card strong {
+  font-size: 22px;
+  color: var(--purple, #4b126f);
+}
+.validation-table-wrap {
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line, #e8e1ec);
+  border-radius: 16px;
+}
+.validation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.validation-table th,
+.validation-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line, #e8e1ec);
+  vertical-align: top;
+}
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+}
+.skip-link:focus {
+  left: 12px;
+  z-index: 80;
+  background: #4b126f;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.connection-banner {
+  display: none;
+}
+@media (max-width: 760px) {
+  .validation-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
