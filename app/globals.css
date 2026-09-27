@@ -6,9 +6,9 @@ body { margin: 0; background: #e9eee8; color: var(--ink); font-family: 'Inter', 
 button, textarea { font: inherit; }
 button { cursor: pointer; }
 .app-shell { min-height: 100vh; padding: 0; background: var(--cream); }
-.app-frame { position: relative; width: 100%; max-width: 480px; min-height: 100vh; margin: 0 auto; padding: 24px 20px 104px; background: var(--cream); overflow: hidden; }
+.app-frame { position: relative; width: 100%; max-width: 480px; min-height: 100vh; margin: 0 auto; padding: 92px 20px 104px; background: var(--cream); overflow: hidden; }
 .topbar, .welcome-block, .section-heading, .appointment-card, .composer-actions, .metric-row { display: flex; align-items: center; justify-content: space-between; }
-.topbar { position: sticky; top: 0; z-index: 40; margin: -24px -20px 38px; padding: 18px 20px 14px; background: rgb(247 247 242 / 92%); border-bottom: 1px solid transparent; backdrop-filter: blur(16px); }
+.topbar { position: fixed; top: 0; left: 50%; z-index: 40; display: flex; width: min(100%, 480px); transform: translateX(-50%); margin: 0; padding: 18px 20px 14px; background: rgb(247 247 242 / 92%); border-bottom: 1px solid var(--line); backdrop-filter: blur(16px); }
 .brand-lockup { display: flex; align-items: center; gap: 9px; }
 .brand-mark { width: 35px; height: 35px; object-fit: contain; }
 .brand-name { display: block; font-family: Georgia, serif; font-size: 20px; font-weight: 700; letter-spacing: -.04em; }
