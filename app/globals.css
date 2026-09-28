@@ -112,6 +112,24 @@ small, .brand-sub { font-size: var(--text-xs); }
 .composer textarea { font-size: var(--text-md); line-height: 1.45; }
 .splash-screen h1 { font-weight: 750; }
 .auth-screen h1, .onboarding-screen h1 { font-weight: 750; }
+
+/* Responsive modal system: centered dialogs on phones, roomy standard modals on larger screens. */
+.modal-backdrop { align-items: center; justify-items: center; overflow-y: auto; }
+.modal { margin: auto; }
+@media (max-width: 699px) {
+  .modal-backdrop { padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+  .modal { width: min(100%, 430px); max-height: calc(100dvh - 32px); padding: 22px 18px; border-radius: 18px; }
+  .modal h2 { margin-right: 32px; }
+  .modal-actions { justify-content: stretch; }
+  .modal-actions > button { flex: 1 1 140px; justify-content: center; }
+}
+@media (min-width: 700px) {
+  .modal-backdrop { padding: 32px; }
+  .modal { width: min(560px, calc(100vw - 64px)); max-height: min(760px, calc(100dvh - 64px)); padding: 30px; border-radius: 24px; }
+}
+@media (min-width: 1100px) {
+  .modal { width: min(600px, calc(100vw - 96px)); }
+}
 .splash-screen, .onboarding-screen, .auth-screen { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; width: 100%; max-width: 480px; margin: 0 auto; padding: 26px 24px 24px; color: #fff; background: linear-gradient(155deg, #32104e 0%, #4b126f 48%, #6d22a1 100%); overflow: hidden; }
 .splash-screen { align-items: flex-start; justify-content: center; padding: 42px 30px; }.splash-glow { position: absolute; top: 12%; right: -35%; width: 90%; aspect-ratio: 1; background: rgb(173 98 223 / 28%); border-radius: 50%; filter: blur(5px); }.splash-logo { position: relative; width: 68px; height: 68px; margin-bottom: 26px; object-fit: contain; }.splash-kicker, .onboarding-topline, .auth-brand { position: relative; font-size: 10px; font-weight: 800; letter-spacing: .18em; }.splash-screen h1 { position: relative; max-width: 320px; margin: 15px 0; font-size: clamp(40px, 12vw, 58px); line-height: .98; letter-spacing: -.07em; }.splash-screen h1 em { color: #d8a8f2; }.splash-note { position: relative; max-width: 240px; color: #ddc9e8; font-size: 14px; line-height: 1.5; }.splash-start { position: absolute; right: 30px; bottom: 34px; display: grid; place-items: center; width: 58px; height: 58px; color: #4b126f; background: #fff; border: 0; border-radius: 18px; }.splash-start svg { width: 20px; }
 .onboarding-screen { justify-content: space-between; background: #fbf8fd; color: #24162b; }.onboarding-topline { display: flex; justify-content: space-between; color: #6d22a1; }.skip-button, .back-link, .text-button { color: #6d22a1; background: transparent; border: 0; font-size: 12px; font-weight: 750; }.onboarding-art { position: relative; display: grid; place-items: center; width: min(74vw, 310px); aspect-ratio: 1; margin: 15px auto 0; }.art-halo { position: absolute; inset: 12%; background: linear-gradient(145deg, #ead7f4, #f8edf9); border-radius: 50%; box-shadow: 0 20px 60px rgb(109 34 161 / 16%); }.art-icon { position: relative; z-index: 1; display: grid; place-items: center; width: 104px; height: 104px; color: #fff; background: linear-gradient(145deg, #4b126f, #8b3cc4); border-radius: 32px; box-shadow: 0 17px 30px rgb(75 18 111 / 26%); }.art-icon svg { width: 42px; height: 42px; }.art-orbit { position: absolute; border: 1px solid #c79ade; border-radius: 50%; transform: rotate(30deg); }.orbit-one { inset: 5% 20%; }.orbit-two { inset: 20% 5%; transform: rotate(-35deg); }.onboarding-copy { padding: 0 4px; }.slide-dots { display: flex; gap: 6px; margin-bottom: 18px; }.slide-dots span { width: 6px; height: 6px; background: #d8c7df; border-radius: 999px; transition: width .2s ease; }.slide-dots span.active { width: 22px; background: #6d22a1; }.onboarding-copy h1, .auth-hero h1, .auth-form h1 { margin-bottom: 10px; font-size: clamp(31px, 9vw, 43px); }.onboarding-copy p, .auth-hero p, .auth-form > p { max-width: 340px; margin: 0; color: #766b7d; font-size: 14px; line-height: 1.55; }.onboarding-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.onboarding-actions .back-link svg, .back-link svg { width: 14px; transform: rotate(180deg); vertical-align: middle; }.onboarding-actions .primary-cta { color: #fff; background: #4b126f; }.onboarding-actions .primary-cta:hover, .splash-start:hover { transform: translateY(-2px); }
