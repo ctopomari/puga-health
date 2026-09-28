@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Activity, ArrowRight, Bell, CalendarDays, ChevronRight, CircleHelp, FileHeart, HeartPulse, Home, Info, LockKeyhole, MessageCircle, Mic, MoreHorizontal, Search, Settings2, ShieldCheck, Sparkles, Stethoscope, UserRound, UsersRound, WalletCards } from 'lucide-react'
 
 const topics = [
@@ -27,7 +27,23 @@ export default function Page() {
   const [onboarding, setOnboarding] = useState<'splash' | 'welcome' | 'auth' | 'app'>('splash')
   const [onboardingSlide, setOnboardingSlide] = useState(0)
   const [authMode, setAuthMode] = useState<'welcome' | 'signin' | 'signup'>('welcome')
-  const [authName, setAuthName] = useState('')
+  const [authName, setAuthName] = useState('Amaka Okafor')
+  const routeByTab: Record<string, string> = { home: '/', talk: '/talk', care: '/care', id: '/health-id', health: '/my-health', access: '/my-access' }
+  const setTab = (tab: string) => {
+    setActiveTab(tab)
+    window.history.pushState({}, '', routeByTab[tab] || '/')
+  }
+  useEffect(() => {
+    const route = window.location.pathname
+    const tab = Object.entries(routeByTab).find(([, path]) => path === route)?.[0]
+    if (tab) setActiveTab(tab)
+    const onPopState = () => {
+      const nextTab = Object.entries(routeByTab).find(([, path]) => path === window.location.pathname)?.[0]
+      if (nextTab) setActiveTab(nextTab)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
   const notifications = ['appointment']
   const onboardingSlides = [
     { title: 'Your health, understood.', body: 'PugaAI Health gives you clear, trusted primary healthcare information in a voice-first experience.', icon: Sparkles },
@@ -44,7 +60,7 @@ export default function Page() {
   }
 
   const startConversation = (prompt = '') => {
-    setActiveTab('talk')
+    setTab('talk')
     if (prompt) notify(`Opening PugaAI on “${prompt}”`)
   }
 
@@ -62,9 +78,9 @@ export default function Page() {
             <button className="icon-button tooltip-trigger" aria-label="Help and safety" data-tooltip="Health information and safety help" onClick={() => setShowHelp(!showHelp)}><CircleHelp /></button>
             <button className="icon-button notification-trigger" aria-label="Notifications" data-tooltip="Notifications" onClick={() => setShowNotifications(!showNotifications)}><Bell />{notifications.length > 0 && <span className="notification-dot" />}</button>
             <div className="profile-menu-wrap header-profile">
-              <button className="avatar tooltip-trigger" aria-label="Open your profile" aria-expanded={showProfile} data-tooltip="Profile and session controls" onClick={() => setShowProfile(!showProfile)}>A</button>
+              <button className="avatar tooltip-trigger" aria-label={`Open ${authName || 'your'} profile`} aria-expanded={showProfile} data-tooltip="Profile and session controls" onClick={() => setShowProfile(!showProfile)}>A</button>
               {showProfile && <div className="profile-dropdown" role="menu" aria-label="Profile menu">
-                <div className="profile-dropdown-header"><div className="profile-avatar">A</div><div><strong>Amaka Okafor</strong><span>Patient account</span></div></div>
+                <div className="profile-dropdown-header"><div className="profile-avatar">{(authName || 'A').charAt(0).toUpperCase()}</div><div><strong>{authName || 'Amaka Okafor'}</strong><span>Patient account</span></div></div>
                 <button role="menuitem" onClick={() => { setShowProfile(false); setModal('consent') }}><ShieldCheck /> Privacy and permissions <ChevronRight /></button>
                 <button role="menuitem" onClick={() => { setShowProfile(false); setModal('settings') }}><Settings2 /> Account settings <ChevronRight /></button>
                 <button role="menuitem" onClick={() => { setShowProfile(false); setModal('signout') }}><UserRound /> Sign out <ChevronRight /></button>
@@ -79,7 +95,7 @@ export default function Page() {
           <section className="welcome-block">
             <div>
               <p className="eyebrow">TUESDAY, SEPTEMBER 24</p>
-              <h1>Good morning, <em>Amaka</em></h1>
+              <h1>Good morning, <em>{(authName || 'Amaka').split(' ')[0]}</em></h1>
               <p className="intro">Your everyday health companion, right here.</p>
             </div>
 
@@ -95,7 +111,7 @@ export default function Page() {
             <div className="topic-grid">{(showAllTopics ? [...topics, { label: 'Find care', icon: Search, tone: 'peach' }, { label: 'Nutrition', icon: Activity, tone: 'mint' }] : topics).map((topic) => { const Icon = topic.icon; return <button className="topic-card" key={topic.label} onClick={() => startConversation(topic.label)}><span className={`topic-icon ${topic.tone}`}><Icon /></span><span>{topic.label}</span><ChevronRight /></button> })}</div>
           </section>
 
-          <section className="section-block"><div className="section-heading"><div><p className="eyebrow">UP NEXT</p><h2>Your care plan</h2></div><button className="text-button" onClick={() => setActiveTab('care')}>View all</button></div><div className="appointment-card"><div className="date-tile"><strong>{appointments[0].day}</strong><span>{appointments[0].month}</span></div><div className="appointment-copy"><strong>{appointments[0].title}</strong><span>{appointments[0].provider}</span><small>{appointments[0].type}</small></div><button className="more-button" aria-label="More appointment options" onClick={() => setModal('appointment')}><MoreHorizontal /></button></div></section>
+          <section className="section-block"><div className="section-heading"><div><p className="eyebrow">UP NEXT</p><h2>Your care plan</h2></div><button className="text-button" onClick={() => setTab('care')}>View all</button></div><div className="appointment-card"><div className="date-tile"><strong>{appointments[0].day}</strong><span>{appointments[0].month}</span></div><div className="appointment-copy"><strong>{appointments[0].title}</strong><span>{appointments[0].provider}</span><small>{appointments[0].type}</small></div><button className="more-button" aria-label="More appointment options" onClick={() => setModal('appointment')}><MoreHorizontal /></button></div></section>
         </>}
 
         {activeTab === 'talk' && <TalkPanel query={query} setQuery={setQuery} onLanguage={() => setModal('language')} onSend={() => { notify(query ? 'PugaAI is thinking…' : 'Try asking a health question'); setQuery('') }} />}
@@ -109,12 +125,12 @@ export default function Page() {
         {modal === 'appointment' && <Modal title="Appointment details" onClose={() => setModal(null)}><div className="appointment-detail"><span className="status-badge">Upcoming</span><h3>Teleconsultation</h3><p><strong>Dr. Amaka Okafor</strong><br />Lagos Island Clinic</p><div className="detail-grid"><div><small>Date</small><strong>24 September</strong></div><div><small>Time</small><strong>10:30 AM</strong></div></div></div><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Close</button><button className="primary-cta" onClick={() => { setModal(null); notify('Teleconsultation details opened') }}>View care plan <ArrowRight /></button></div></Modal>}
         {modal === 'language' && <Modal title="Choose response language" onClose={() => setModal(null)}><p className="modal-copy">Choose the language PugaAI should use for health education responses.</p><button className="modal-list-button selected" onClick={() => { setModal(null); notify('English selected') }}>English (Nigeria) <span>Selected</span></button><button className="modal-list-button" onClick={() => { setModal(null); notify('Nigerian Pidgin selected') }}>Nigerian Pidgin <ChevronRight /></button><button className="modal-list-button" onClick={() => { setModal(null); notify('Yorùbá selected') }}>Yorùbá <ChevronRight /></button></Modal>}
         {modal === 'settings' && <Modal title="Account settings" onClose={() => setModal(null)}><p className="modal-copy">Your Phase 1 profile controls are ready. Authentication and linked care services will be added in Phase 2.</p><div className="settings-list"><div><strong>Education language</strong><span>English (Nigeria)</span></div><div><strong>Health information</strong><span>Private by default</span></div><div><strong>Care connections</strong><span>Not connected in Phase 1</span></div></div><div className="modal-actions"><button className="primary-cta" onClick={() => { setModal(null); notify('Settings saved') }}>Done <ArrowRight /></button></div></Modal>}
-        {modal === 'signout' && <Modal title="Sign out of this session?" onClose={() => setModal(null)}><p className="modal-copy">Signing out is not enabled in Phase 1 because this experience uses a local demo profile. Your health questions remain on this device session.</p><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Cancel</button><button className="primary-cta" onClick={() => { setModal(null); notify('Session ended') }}>End session <ArrowRight /></button></div></Modal>}
+        {modal === 'signout' && <Modal title="Sign out of this session?" onClose={() => setModal(null)}><p className="modal-copy">You will return to the welcome carousel. Your local profile details will be cleared from this session.</p><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Cancel</button><button className="primary-cta" onClick={() => { setModal(null); setShowProfile(false); setOnboardingSlide(0); setAuthMode('welcome'); setOnboarding('welcome'); notify('You have been signed out') }}>End session <ArrowRight /></button></div></Modal>}
         {modal === 'care' && <Modal title="Find care near you" onClose={() => setModal(null)}><p className="modal-copy">Care navigation is prepared for Phase 2. PugaAI will connect you with PigaCare, PugaAccess, and PugaCure after the linkage phase is enabled.</p><div className="settings-list"><div><strong>Clinics</strong><span>Trusted primary care</span></div><div><strong>Pharmacies</strong><span>Medication support</span></div><div><strong>Labs</strong><span>Diagnostic services</span></div></div><div className="modal-actions"><button className="primary-cta" onClick={() => { setModal(null); notify('Care options saved for Phase 2') }}>Got it <ArrowRight /></button></div></Modal>}
         {modal === 'healthId' && <Modal title="Manage Health ID access" onClose={() => setModal(null)}><div className="permission-card"><ShieldCheck /><div><strong>Private by default</strong><p>No provider or service can access your Health ID without your permission.</p></div></div><p className="modal-copy">Access management will become active when linked care services are introduced in Phase 2.</p><div className="modal-actions"><button className="secondary-cta" onClick={() => setModal(null)}>Close</button><button className="primary-cta" onClick={() => { setModal(null); notify('Health ID access reviewed') }}>Review access <ArrowRight /></button></div></Modal>}
         {modal === 'privacy' && <Modal title="Privacy and access" onClose={() => setModal(null)}><p className="modal-copy">PugaAI Health uses your questions only to provide Phase 1 primary healthcare information and education. It does not diagnose, prescribe, or connect to OpenAI in this phase.</p><div className="settings-list"><div><strong>Data sharing</strong><span>Off by default</span></div><div><strong>AI service</strong><span>N-ATLAS only</span></div><div><strong>Care linkage</strong><span>Planned for Phase 2</span></div></div><div className="modal-actions"><button className="primary-cta" onClick={() => { setModal(null); notify('Privacy settings confirmed') }}>Done <ArrowRight /></button></div></Modal>}
 
-        <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'id', label: 'Health ID', Icon: FileHeart }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab(id)}><Icon /><span>{label}</span></button>)}</nav>
+        <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'id', label: 'Health ID', Icon: FileHeart }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setTab(id)}><Icon /><span>{label}</span></button>)}</nav>
         {toast && <div className="toast" role="status">{toast}</div>}
         </>}
       </div>
