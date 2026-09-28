@@ -24,7 +24,19 @@ export default function Page() {
   const [showHelp, setShowHelp] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [modal, setModal] = useState<'emergency' | 'consent' | 'appointment' | 'language' | 'settings' | 'signout' | 'care' | 'healthId' | 'privacy' | null>(null)
+  const [onboarding, setOnboarding] = useState<'splash' | 'welcome' | 'auth' | 'app'>('splash')
+  const [onboardingSlide, setOnboardingSlide] = useState(0)
+  const [authMode, setAuthMode] = useState<'welcome' | 'signin' | 'signup'>('welcome')
+  const [authName, setAuthName] = useState('')
   const notifications = ['appointment']
+  const onboardingSlides = [
+    { title: 'Your health, understood.', body: 'PugaAI Health gives you clear, trusted primary healthcare information in a voice-first experience.', icon: Sparkles },
+    { title: 'Ask naturally.', body: 'Speak your health question and receive simple education designed for everyday decisions.', icon: Mic },
+    { title: 'Learn with confidence.', body: 'Explore helpful guidance about prevention, symptoms, pregnancy, child health, and more.', icon: HeartPulse },
+    { title: 'Know your next step.', body: 'Understand when self-care may help and when it is important to seek professional care.', icon: Stethoscope },
+    { title: 'Your privacy matters.', body: 'Your Phase 1 experience is private by default and focused on education, not diagnosis.', icon: ShieldCheck },
+    { title: 'Welcome to PugaAI.', body: 'Start learning about your health with N-ATLAS. Care connections arrive in Phase 2.', icon: Activity },
+  ]
 
   const notify = (message: string) => {
     setToast(message)
@@ -39,6 +51,8 @@ export default function Page() {
   return (
     <main className="app-shell">
       <div className="app-frame">
+        {onboarding !== 'app' && <OnboardingScreen stage={onboarding} slide={onboardingSlides[onboardingSlide]} slideIndex={onboardingSlide} slideCount={onboardingSlides.length} authMode={authMode} authName={authName} setAuthName={setAuthName} onNext={() => { if (onboarding === 'splash') setOnboarding('welcome'); else if (onboardingSlide < onboardingSlides.length - 1) setOnboardingSlide((value) => value + 1); else setOnboarding('auth') }} onBack={() => onboardingSlide > 0 ? setOnboardingSlide((value) => value - 1) : setOnboarding('welcome')} onAuthMode={setAuthMode} onComplete={() => setOnboarding('app')} />}
+        {onboarding === 'app' && <>
         <header className="topbar">
           <div className="brand-lockup">
             <img src="/puga-trinicare-compact.png" alt="Puga TriniCare" className="brand-mark" />
@@ -102,9 +116,17 @@ export default function Page() {
 
         <nav className="bottom-nav" aria-label="Primary navigation">{[{ id: 'home', label: 'Home', Icon: Home }, { id: 'talk', label: 'Ask Puga', Icon: MessageCircle }, { id: 'care', label: 'Care', Icon: CalendarDays }, { id: 'id', label: 'Health ID', Icon: FileHeart }, { id: 'health', label: 'My health', Icon: UserRound }].map(({ id, label, Icon }) => <button key={id} className={activeTab === id ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab(id)}><Icon /><span>{label}</span></button>)}</nav>
         {toast && <div className="toast" role="status">{toast}</div>}
+        </>}
       </div>
     </main>
   )
+}
+
+function OnboardingScreen({ stage, slide, slideIndex, slideCount, authMode, authName, setAuthName, onNext, onBack, onAuthMode, onComplete }: { stage: 'splash' | 'welcome' | 'auth'; slide: { title: string; body: string; icon: typeof Sparkles }; slideIndex: number; slideCount: number; authMode: 'welcome' | 'signin' | 'signup'; authName: string; setAuthName: (value: string) => void; onNext: () => void; onBack: () => void; onAuthMode: (mode: 'welcome' | 'signin' | 'signup') => void; onComplete: () => void }) {
+  if (stage === 'splash') return <section className="splash-screen" aria-label="PugaAI Health splash screen"><div className="splash-glow" /><img src="/puga-trinicare-compact.png" alt="PugaAI Health" className="splash-logo" /><p className="splash-kicker">PUGAAI HEALTH</p><h1>Care starts with<br /><em>understanding.</em></h1><p className="splash-note">Primary healthcare information, made human.</p><button className="splash-start" onClick={onNext} aria-label="Start PugaAI Health"><ArrowRight /></button></section>
+  if (stage === 'auth') return <section className="auth-screen" aria-label="PugaAI Health sign in"><div className="auth-brand"><img src="/puga-trinicare-compact.png" alt="PugaAI Health" /><span>PugaAI <strong>Health</strong></span></div>{authMode === 'welcome' ? <><div className="auth-hero"><p className="eyebrow">WELCOME</p><h1>Your health journey starts here.</h1><p>Sign in to keep your conversations and preferences together, or continue with a local Phase 1 profile.</p></div><div className="auth-actions"><button className="primary-cta" onClick={() => onAuthMode('signin')}>Sign in <ArrowRight /></button><button className="secondary-cta" onClick={() => onAuthMode('signup')}>Create profile</button><button className="text-button" onClick={onComplete}>Continue without account</button></div></> : <div className="auth-form"><button className="back-link" onClick={() => onAuthMode('welcome')}><ArrowRight /> Back</button><p className="eyebrow">{authMode === 'signin' ? 'SIGN IN' : 'CREATE PROFILE'}</p><h1>{authMode === 'signin' ? 'Welcome back.' : 'Meet PugaAI Health.'}</h1><p>{authMode === 'signin' ? 'Your profile stays private by default.' : 'Create a simple local profile for this Phase 1 experience.'}</p>{authMode === 'signup' && <input value={authName} onChange={(event) => setAuthName(event.target.value)} placeholder="Your name" aria-label="Your name" />}{authMode === 'signin' && <input placeholder="Email address" aria-label="Email address" type="email" />}<input placeholder="Password" aria-label="Password" type="password" /><button className="primary-cta" onClick={onComplete}>{authMode === 'signin' ? 'Sign in' : 'Create profile'} <ArrowRight /></button><small>Phase 1 uses N-ATLAS for primary healthcare education. No OpenAI API is connected.</small></div>}</section>
+  const Icon = slide.icon
+  return <section className="onboarding-screen" aria-label={`Welcome slide ${slideIndex + 1} of ${slideCount}`}><div className="onboarding-topline"><span>PUGAAI HEALTH</span><button className="skip-button" onClick={() => onComplete()}>Skip</button></div><div className="onboarding-art"><div className="art-halo" /><div className="art-icon"><Icon /></div><span className="art-orbit orbit-one" /><span className="art-orbit orbit-two" /></div><div className="onboarding-copy"><div className="slide-dots" aria-label="Onboarding progress">{Array.from({ length: slideCount }, (_, index) => <span key={index} className={index === slideIndex ? 'active' : ''} />)}</div><h1>{slide.title}</h1><p>{slide.body}</p></div><div className="onboarding-actions"><button className="back-link" onClick={onBack} disabled={slideIndex === 0}><ArrowRight /> Back</button><button className="primary-cta" onClick={onNext}>{slideIndex === slideCount - 1 ? 'Continue' : 'Next'} <ArrowRight /></button></div></section>
 }
 
 function TalkPanel({ query, setQuery, onLanguage, onSend }: { query: string; setQuery: (value: string) => void; onLanguage: () => void; onSend: () => void }) {
